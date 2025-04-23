@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备管理平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+            background-color: #0c6aa9;
+            color: white;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 180px;
+            background-color: #0c6aa9;
+            color: white;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            padding: 12px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-menu li.active {
+            background-color: #095b91;
+            border-left-color: #26a69a;
+        }
+        
+        .sidebar-menu .icon {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .content-area {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #fff;
+        }
+        
+        .page-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .search-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+        }
+        
+        .search-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .search-input input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+        }
+        
+        .search-bar button {
+            padding: 8px 15px;
+            background-color: #0c6aa9;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background-color: #0c6aa9;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        
+        .tag-normal {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+        
+        .tag-inuse {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .tag-outofuse {
+            background-color: #ffebee;
+            color: #f44336;
+        }
+        
+        .operation {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .edit-btn, .delete-btn, .qr-btn {
+            color: #0c6aa9;
+            cursor: pointer;
+        }
+        
+        .delete-btn {
+            color: #f44336;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 5px;
+        }
+        
+        .pagination span {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .pagination span.active {
+            background-color: #0c6aa9;
+            color: white;
+            border-color: #0c6aa9;
+        }
+        
+        .footer {
+            height: 30px;
+            background-color: #f5f5f5;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 12px;
+            color: #777;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 5px;
+            width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .close-btn {
+            cursor: pointer;
+            font-size: 20px;
+        }
+        
+        .modal-body {
+            padding: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .modal-footer {
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .modal-footer button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .cancel-btn {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .save-btn {
+            background-color: #0c6aa9;
+            color: white;
+        }
+        
+        /* QR Code Modal */
+        .qr-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .qr-modal-content {
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        
+        .qr-image {
+            max-width: 200px;
+            max-height: 200px;
+        }
+        
+        .qr-modal-close {
+            margin-top: 15px;
+            padding: 8px 15px;
+            background-color: #0c6aa9;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">设备管理平台</div>
+        <div class="user-info">
+            <div class="user-avatar">U</div>
+            <span>管理员</span>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li class="active"><span class="icon">🏠</span>菜单管理</li>
+                <li><span class="icon">🔧</span>设备管理</li>
+                <li><span class="icon">📋</span>权限管理</li>
+                <li><span class="icon">⚙️</span>系统管理</li>
+            </ul>
+        </div>
+        
+        <div class="content-area">
+            <div class="page-title">设备管理 · 设备列表</div>
+            
+            <div class="search-bar">
+                <div class="search-input">
+                    <input type="text" id="searchInput" placeholder="请输入设备编号">
+                    <button id="searchBtn">搜索</button>
+                </div>
+                <div class="action-buttons">
+                    <button id="addEquipmentBtn">新增设备</button>
+                    <button id="refreshBtn">刷新列表</button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>设备编号</th>
+                            <th>采购单位</th>
+                            <th>采购时间</th>
+                            <th>负责人</th>
+                            <th>使用状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="equipmentTable">
+                        <!-- 表格内容将通过 JavaScript 动态生成 -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="pagination">
+                <span id="recordsInfo">总记录数 [ 0 ] 条 第 1/1 页</span>
+                <span class="active" id="page1">1</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <div>大道至简 设计天下</div>
+        <div>版权所有 © 2023 设备管理综合平台</div>
+    </div>
+    
+    <!-- 添加/编辑设备模态框 -->
+    <div class="modal" id="equipmentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">添加设备</div>
+                <span class="close-btn" id="closeModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="equipmentForm">
+                    <input type="hidden" id="equipmentId">
+                    <div class="form-group">
+                        <label for="equipmentCode">设备编号</label>
+                        <input type="text" id="equipmentCode" pattern="[A-Za-z]\d+" title="设备编号必须以字母开头，后跟数字" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="qrCodeUrl">二维码URL</label>
+                        <input type="text" id="qrCodeUrl" placeholder="输入二维码对应的URL" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="purchaseUnit">采购单位</label>
+                        <input type="text" id="purchaseUnit" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="purchaseDate">采购时间</label>
+                        <input type="date" id="purchaseDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="equipmentManager">负责人</label>
+                        <input type="text" id="equipmentManager" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="equipmentStatus">使用状态</label>
+                        <select id="equipmentStatus" required>
+                            <option value="正常使用">正常使用</option>
+                            <option value="维修中">维修中</option>
+                            <option value="停用">停用</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn" id="cancelBtn">取消</button>
+                <button class="save-btn" id="saveEquipmentBtn">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 二维码预览模态框 -->
+    <div class="qr-modal" id="qrModal">
+        <div class="qr-modal-content">
+            <h3>设备二维码</h3>
+            <img src="" alt="二维码" id="qrImage" class="qr-image">
+            <button class="qr-modal-close" id="qrModalClose">关闭</button>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <script>
+        // 设备数据数组
+        let equipments = JSON.parse(localStorage.getItem('equipments')) || [
+            {
+                id: 1,
+                code: 'E001',
+                qrCodeUrl: 'https://example.com/device-info.html?id=E001',
+                purchaseUnit: '单位A',
+                purchaseDate: '2022-01-15',
+                manager: '张三',
+                status: '正常使用'
+            },
+            {
+                id: 2,
+                code: 'E002',
+                qrCodeUrl: 'https://example.com/device-info.html?id=E002',
+                purchaseUnit: '单位B',
+                purchaseDate: '2022-03-22',
+                manager: '李四',
+                status: '维修中'
+            },
+            {
+                id: 3,
+                code: 'E003',
+                qrCodeUrl: 'https://example.com/device-info.html?id=E003',
+                purchaseUnit: '单位C',
+                purchaseDate: '2022-05-10',
+                manager: '王五',
+                status: '正常使用'
+            },
+            {
+                id: 4,
+                code: 'E004',
+                qrCodeUrl: 'https://example.com/device-info.html?id=E004',
+                purchaseUnit: '单位D',
+                purchaseDate: '2022-07-05',
+                manager: '赵六',
+                status: '停用'
+            }
+        ];
+        
+        // 当前编辑的设备 ID
+        let currentEditId = null;
+        
+        // DOM 元素
+        const equipmentTable = document.getElementById('equipmentTable');
+        const equipmentModal = document.getElementById('equipmentModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const closeModal = document.getElementById('closeModal');
+        const equipmentForm = document.getElementById('equipmentForm');
+        const equipmentId = document.getElementById('equipmentId');
+        const equipmentCode = document.getElementById('equipmentCode');
+        const qrCodeUrl = document.getElementById('qrCodeUrl');
+        const purchaseUnit = document.getElementById('purchaseUnit');
+        const purchaseDate = document.getElementById('purchaseDate');
+        const equipmentManager = document.getElementById('equipmentManager');
+        const equipmentStatus = document.getElementById('equipmentStatus');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const saveEquipmentBtn = document.getElementById('saveEquipmentBtn');
+        const addEquipmentBtn = document.getElementById('addEquipmentBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const recordsInfo = document.getElementById('recordsInfo');
+        
+        // 二维码模态框元素
+        const qrModal = document.getElementById('qrModal');
+        const qrImage = document.getElementById('qrImage');
+        const qrModalClose = document.getElementById('qrModalClose');
+        
+        // 渲染设备列表
+        function renderEquipmentTable(data) {
+            equipmentTable.innerHTML = '';
+            data.forEach(equipment => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${equipment.code}</td>
+                    <td>${equipment.purchaseUnit}</td>
+                    <td>${equipment.purchaseDate}</td>
+                    <td>${equipment.manager}</td>
+                    <td><span class="tag ${getStatusClass(equipment.status)}">${equipment.status}</span></td>
+                    <td>
+                        <div class="operation">
+                            <span class="edit-btn" data-id="${equipment.id}">编辑</span>
+                            <span class="delete-btn" data-id="${equipment.id}">删除</span>
+                            <span class="qr-btn" data-id="${equipment.id}">二维码</span>
+                        </div>
+                    </td>
+                `;
+                equipmentTable.appendChild(row);
+            });
+            
+            // 绑定编辑按钮事件
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    editEquipment(id);
+                });
+            });
+            
+            // 绑定删除按钮事件
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    deleteEquipment(id);
+                });
+            });
+            
+            // 绑定二维码按钮事件
+            document.querySelectorAll('.qr-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    showQrCode(id);
+                });
+            });
+            
+            // 更新记录数信息
+            recordsInfo.textContent = `总记录数 [ ${data.length} ] 条 第 1/1 页`;
+        }
+        
+        // 获取状态对应的样式类
+        function getStatusClass(status) {
+            switch (status) {
+                case '正常使用':
+                    return 'tag-normal';
+                case '维修中':
+                    return 'tag-inuse';
+                case '停用':
+                    return 'tag-outofuse';
+                default:
+                    return '';
+            }
+        }
+        
+        // 打开模态框
+        function openModal(title, isEdit = false) {
+            modalTitle.textContent = title;
+            equipmentModal.style.display = 'flex';
+            
+            if (isEdit) {
+                equipmentCode.focus();
+            } else {
+                equipmentCode.value = '';
+                qrCodeUrl.value = '';
+                purchaseUnit.value = '';
+                purchaseDate.value = '';
+                equipmentManager.value = '';
+                equipmentStatus.value = '正常使用';
+                equipmentCode.focus();
+            }
+        }
+        
+        // 关闭模态框
+        function closeModaL() {
+            equipmentModal.style.display = 'none';
+            equipmentForm.reset();
+            currentEditId = null;
+        }
+        
+        // 添加设备
+        function addEquipment() {
+            const newEquipment = {
+                id: equipments.length > 0 ? Math.max(...equipments.map(e => e.id)) + 1 : 1,
+                code: equipmentCode.value,
+                qrCodeUrl: qrCodeUrl.value,
+                purchaseUnit: purchaseUnit.value,
+                purchaseDate: purchaseDate.value,
+                manager: equipmentManager.value,
+                status: equipmentStatus.value
+            };
+            
+            equipments.push(newEquipment);
+            saveEquipmentsToLocalStorage();
+            renderEquipmentTable(equipments);
+            closeModaL();
+        }
+        
+        // 编辑设备
+        function editEquipment(id) {
+            const equipment = equipments.find(e => e.id === id);
+            if (equipment) {
+                currentEditId = id;
+                equipmentId.value = id;
+                equipmentCode.value = equipment.code;
+                qrCodeUrl.value = equipment.qrCodeUrl;
+                purchaseUnit.value = equipment.purchaseUnit;
+                purchaseDate.value = equipment.purchaseDate;
+                equipmentManager.value = equipment.manager;
+                equipmentStatus.value = equipment.status;
+                openModal('编辑设备', true);
+            }
+        }
+        
+        // 保存编辑的设备
+        function saveEditedEquipment() {
+            if (currentEditId !== null) {
+                const index = equipments.findIndex(e => e.id === currentEditId);
+                if (index !== -1) {
+                    equipments[index].code = equipmentCode.value;
+                    equipments[index].qrCodeUrl = qrCodeUrl.value;
+                    equipments[index].purchaseUnit = purchaseUnit.value;
+                    equipments[index].purchaseDate = purchaseDate.value;
+                    equipments[index].manager = equipmentManager.value;
+                    equipments[index].status = equipmentStatus.value;
+                    
+                    saveEquipmentsToLocalStorage();
+                    renderEquipmentTable(equipments);
+                    closeModaL();
+                }
+            }
+        }
+        
+        // 删除设备
+        function deleteEquipment(id) {
+            if (confirm('确定要删除这个设备吗？')) {
+                equipments = equipments.filter(e => e.id !== id);
+                saveEquipmentsToLocalStorage();
+                renderEquipmentTable(equipments);
+            }
+        }
+        
+        // 显示二维码
+        function showQrCode(id) {
+            const equipment = equipments.find(e => e.id === id);
+            if (equipment) {
+                // 生成二维码
+                const qrCode = qrcode(4, 'L');
+                qrCode.addData(equipment.qrCodeUrl);
+                qrCode.make();
+                
+                // 显示二维码模态框
+                qrImage.src = qrCode.createDataURL();
+                qrModal.style.display = 'flex';
+            }
+        }
+        
+        // 关闭二维码模态框
+        function closeQrModal() {
+            qrModal.style.display = 'none';
+        }
+        
+        // 搜索功能
+        function searchEquipments() {
+            const searchTerm = searchInput.value.trim();
+            if (searchTerm) {
+                const filteredEquipments = equipments.filter(equipment => 
+                    equipment.code === searchTerm
+                );
+                renderEquipmentTable(filteredEquipments);
+            } else {
+                renderEquipmentTable(equipments);
+            }
+        }
+        
+        // 刷新列表
+        function refreshList() {
+            renderEquipmentTable(equipments);
+        }
+        
+        // 保存设备数据到本地存储
+        function saveEquipmentsToLocalStorage() {
+            localStorage.setItem('equipments', JSON.stringify(equipments));
+        }
+        
+        // 事件监听器
+        addEquipmentBtn.addEventListener('click', () => {
+            openModal('添加设备');
+        });
+        
+        closeModal.addEventListener('click', closeModaL);
+        
+        cancelBtn.addEventListener('click', closeModaL);
+        
+        saveEquipmentBtn.addEventListener('click', () => {
+            if (currentEditId !== null) {
+                saveEditedEquipment();
+            } else {
+                addEquipment();
+            }
+        });
+        
+        refreshBtn.addEventListener('click', refreshList);
+        
+        searchBtn.addEventListener('click', searchEquipments);
+        
+        qrModalClose.addEventListener('click', closeQrModal);
+        
+        // 初始化页面
+        renderEquipmentTable(equipments);
+    </script>
+</body>
+</html>

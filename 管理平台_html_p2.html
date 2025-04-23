@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备详情</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            color: #0c6aa9;
+            margin-bottom: 10px;
+        }
+        
+        .device-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .device-info h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #0c6aa9;
+        }
+        
+        .info-item {
+            margin-bottom: 15px;
+        }
+        
+        .info-item label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .status-normal {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+        
+        .status-inuse {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .status-outofuse {
+            background-color: #ffebee;
+            color: #f44336;
+        }
+        
+        .qr-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .qr-image {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .qr-hint {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>设备详情</h1>
+        </div>
+        
+        <div class="device-card">
+            <div class="device-info">
+                <h2 id="deviceCode">设备编号: E001</h2>
+                <div class="info-item">
+                    <label>采购单位:</label>
+                    <div id="purchaseUnit">单位A</div>
+                </div>
+                <div class="info-item">
+                    <label>采购时间:</label>
+                    <div id="purchaseDate">2022-01-15</div>
+                </div>
+                <div class="info-item">
+                    <label>负责人:</label>
+                    <div id="manager">张三</div>
+                </div>
+                <div class="info-item">
+                    <label>使用状态:</label>
+                    <span id="status" class="status status-normal">正常使用</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 从URL中获取设备编号
+        const urlParams = new URLSearchParams(window.location.search);
+        const deviceId = urlParams.get('id');
+        
+        // 模拟设备数据
+        const deviceData = {
+            E001: {
+                code: 'E001',
+                purchaseUnit: '单位A',
+                purchaseDate: '2022-01-15',
+                manager: '张三',
+                status: '正常使用'
+            },
+            E002: {
+                code: 'E002',
+                purchaseUnit: '单位B',
+                purchaseDate: '2022-03-22',
+                manager: '李四',
+                status: '维修中'
+            },
+            E003: {
+                code: 'E003',
+                purchaseUnit: '单位C',
+                purchaseDate: '2022-05-10',
+                manager: '王五',
+                status: '正常使用'
+            },
+            E004: {
+                code: 'E004',
+                purchaseUnit: '单位D',
+                purchaseDate: '2022-07-05',
+                manager: '赵六',
+                status: '停用'
+            }
+        };
+        
+        // 页面加载时初始化设备数据
+        document.addEventListener('DOMContentLoaded', function() {
+            if (deviceId && deviceData[deviceId]) {
+                const device = deviceData[deviceId];
+                
+                // 更新设备信息
+                document.getElementById('deviceCode').textContent = `设备编号: ${device.code}`;
+                document.getElementById('purchaseUnit').textContent = device.purchaseUnit;
+                document.getElementById('purchaseDate').textContent = device.purchaseDate;
+                document.getElementById('manager').textContent = device.manager;
+                
+                // 更新状态标签
+                const statusElement = document.getElementById('status');
+                statusElement.textContent = device.status;
+                statusElement.className = `status status-${getStatusClass(device.status)}`;
+            } else {
+                // 如果设备ID无效，显示错误信息
+                document.querySelector('.device-card').innerHTML = '<p>设备信息未找到</p>';
+            }
+        });
+        
+        // 根据状态获取对应的样式类
+        function getStatusClass(status) {
+            switch (status) {
+                case '正常使用':
+                    return 'normal';
+                case '维修中':
+                    return 'inuse';
+                case '停用':
+                    return 'outofuse';
+                default:
+                    return 'normal';
+            }
+        }
+    </script>
+</body>
+</html>
